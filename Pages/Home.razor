@@ -1,20 +1,61 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
-
-<h1>Hello, world!</h1>
-
-<BarChart @ref="barChart" Height="300" Class="mb-4" />
+<PageTitle>Inicio</PageTitle>
+<center>
+    <h1>Dashcreator: Chart Designer</h1>
+</center>
+<form>
+    <div class="mb-3">
+        <label class="form-label">Titulo</label>
+        <input class="form-control" @bind="titulo">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Titulo de la variable vertical</label>
+        <input class="form-control" @bind="tituloVertical">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Titulo de la variable horizontal</label>
+        <input class="form-control" @bind="tituloHorizontal">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Datos de la variable horizontal</label>
+        <input class="form-control" @bind="datosHorizontal">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Datos</label>
+        <input class="form-control" @bind="datos">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Nombres de los datos</label>
+        <input class="form-control" @bind="nombresDatos">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">colores de los datos</label>
+        <input class="form-control" @bind="coloresDatos">
+    </div>
+    <button type="submit" class="btn btn-primary" @onclick="CapturarDatos">generar</button>
+</form>
+<BarChart @ref="barChart"/>
+<LineChart @ref="lineChart"/>
 
 @code {
+    private string titulo;
+    private string tituloVertical;
+    private string tituloHorizontal;
+    private string datosHorizontal;
+    private string datos;
+    private string nombresDatos;
+    private string coloresDatos;
     private BarChart barChart = default!;
     private LineChart lineChart = default!;
+    private ChartData chartData = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await RenderManhattanAsync();
+            await RenderWormAsync();
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -63,5 +104,184 @@
         options.Scales.Y.Title.Display = true;
 
         await barChart.InitializeAsync(data, options);
+    }
+
+    private async Task RenderWormAsync()
+    {
+        var data = new ChartData
+            {
+                Labels = new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" },
+                Datasets = new List<IChartDataset>()
+                {
+                    new LineChartDataset()
+                    {
+                        Label = "India",
+                        Data = new List<double>{ 9, 20, 29, 33, 50, 66, 75, 86, 91, 105, 120, 126, 141, 150, 156, 164, 177, 180, 184, 195 },
+                        BackgroundColor = new List<string>{ "rgb(88, 80, 141)" },
+                        BorderColor = new List<string>{ "rgb(88, 80, 141)" },
+                        BorderWidth = new List<double>{2},
+                        HoverBorderWidth = new List<double>{4},
+                        PointBackgroundColor = new List<string>{ "rgb(88, 80, 141)" },
+                        PointBorderColor = new List<string>{ "rgb(88, 80, 141)" },
+                        PointRadius = new List<int>{0}, // hide points
+                        PointHoverRadius = new List<int>{4},
+                    },
+                    new LineChartDataset()
+                    {
+                        Label = "England",
+                        Data = new List<double>{ 1, 1, 8, 19, 24, 26, 39, 47, 56, 66, 75, 88, 95, 100, 109, 114, 124, 129, 140, 142 },
+                        BackgroundColor = new List<string>{ "rgb(255, 166, 0)" },
+                        BorderColor = new List<string>{ "rgb(255, 166, 0)" },
+                        BorderWidth = new List<double>{2},
+                        HoverBorderWidth = new List<double>{4},
+                        PointBackgroundColor = new List<string>{ "rgb(255, 166, 0)" },
+                        PointBorderColor = new List<string>{ "rgb(255, 166, 0)" },
+                        PointRadius = new List<int>{0},
+                        PointHoverRadius = new List<int>{4},
+                    }
+                }
+            };
+
+        var options = new LineChartOptions();
+
+        options.Interaction.Mode = InteractionMode.Index;
+
+        options.Plugins.Title!.Text = "WORM";
+        options.Plugins.Title.Display = true;
+        options.Plugins.Title.Font!.Size = 20;
+
+        options.Responsive = true;
+
+        options.Scales.X!.Title!.Text = "Overs";
+        options.Scales.X.Title.Display = true;
+
+        options.Scales.Y!.Title!.Text = "Runs";
+        options.Scales.Y.Title.Display = true;
+
+        await lineChart.InitializeAsync(data, options);
+    }
+
+    private async Task CapturarDatos()
+    {
+        int[,] arraydatos = Separardatos(datos);
+        List<string> listadatosHorizontal = Separarstringalist(datosHorizontal);
+        List<string> listacoloresDatos = Separarstringalist(coloresDatos);
+        List<string> listanombresDatos = Separarstringalist(nombresDatos);
+        chartData = new ChartData { Labels = listadatosHorizontal, Datasets = GetDataSets(arraydatos, listacoloresDatos, listanombresDatos) };
+        var barChartOptions = new BarChartOptions();
+        barChartOptions.Interaction.Mode = InteractionMode.Index;
+
+        barChartOptions.Plugins.Title!.Text = titulo;
+        barChartOptions.Plugins.Title.Display = true;
+        barChartOptions.Plugins.Title.Font!.Size = 20;
+
+        barChartOptions.Responsive = true;
+
+        barChartOptions.Scales.X!.Title!.Text = tituloHorizontal;
+        barChartOptions.Scales.X.Title.Display = true;
+
+        barChartOptions.Scales.Y!.Title!.Text = tituloVertical;
+        barChartOptions.Scales.Y.Title.Display = true;
+
+        var lineChartOptions = new LineChartOptions();
+
+        lineChartOptions.Interaction.Mode = InteractionMode.Index;
+
+        lineChartOptions.Plugins.Title!.Text = titulo;
+        lineChartOptions.Plugins.Title.Display = true;
+        lineChartOptions.Plugins.Title.Font!.Size = 20;
+
+        lineChartOptions.Responsive = true;
+
+        lineChartOptions.Scales.X!.Title!.Text = tituloHorizontal;
+        lineChartOptions.Scales.X.Title.Display = true;
+
+        lineChartOptions.Scales.Y!.Title!.Text = tituloVertical;
+        lineChartOptions.Scales.Y.Title.Display = true;
+
+        await barChart.UpdateAsync(chartData, barChartOptions);
+        await lineChart.UpdateAsync(chartData, lineChartOptions);
+    }
+
+    public static int[,] Separardatos(string datos)
+    {
+        char[] separadoresFilas = { '-' };
+        char[] separadoresElementos = { ',' };
+
+        string[] filas = datos.Split(separadoresFilas, StringSplitOptions.RemoveEmptyEntries);
+        List<List<int>> matriz = new List<List<int>>();
+
+        foreach (var fila in filas)
+        {
+            string[] elementos = fila.Split(separadoresElementos, StringSplitOptions.RemoveEmptyEntries);
+            List<int> filaNumeros = new List<int>();
+            foreach (var elemento in elementos)
+            {
+                int numero;
+                if (int.TryParse(elemento, out numero))
+                {
+                    filaNumeros.Add(numero);
+                }
+            }
+            matriz.Add(filaNumeros);
+        }
+
+        int[,] arrayMultidimensional = new int[matriz.Count, matriz[0].Count];
+        for (int i = 0; i < matriz.Count; i++)
+        {
+            for (int j = 0; j < matriz[i].Count; j++)
+            {
+                arrayMultidimensional[i, j] = matriz[i][j];
+            }
+        }
+
+        return arrayMultidimensional;
+    }
+
+    public static List<string> Separarstringalist(string texto)
+    {
+        string[] elementos = texto.Split(',');
+        List<string> lista = new List<string>(elementos);
+        return lista;
+    }
+
+    public static Color ObtenerColorPorNombre(string nombreColor)
+    {
+        string nombreMinusculas = nombreColor.ToLower();
+        return Color.FromName(nombreMinusculas);
+    }
+
+    private List<IChartDataset> GetDataSets(int[,] array, List<string> listacolores, List<string> listanombres)
+    {
+        var datasets = new List<IChartDataset>();
+        int filas = array.GetLength(0);
+        int columnas = array.GetLength(1);
+        for (var index = 0; index < filas; index++)
+        {
+            List<double> fila = new List<double>();
+
+            for (int j = 0; j < columnas; j++)
+            {
+                fila.Add((double)array[index, j]);
+            }
+
+            Color color = ObtenerColorPorNombre(listacolores[index]);
+            string colorrgb = $"rgb({color.R}, {color.G}, {color.B})";
+            datasets.Add(GetBarChartDataset(listanombres[index], fila, colorrgb));
+        }
+
+        return datasets;
+    }
+
+    private BarChartDataset GetBarChartDataset(string label, List<double> listadatos, string color)
+    {
+        return new BarChartDataset()
+            {
+                Label = label,
+                Data = listadatos,
+                BackgroundColor = new List<string> { color },
+                CategoryPercentage = 0.8,
+                BarPercentage = 1,
+            };
     }
 }
