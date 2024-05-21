@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "MyBlazorApp.csproj",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "wwwroot"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/" }
+  ]
+}
