@@ -1,42 +1,48 @@
-﻿@page "/"
+﻿﻿@page "/"
 
 <PageTitle>Inicio</PageTitle>
 <center>
     <h1>Dashcreator: Chart Designer</h1>
 </center>
-<form>
-    <div class="mb-3">
-        <label class="form-label">Titulo</label>
-        <input class="form-control" @bind="titulo">
+<div class="row">
+    <div class="col-md-6 bg-light p-4">
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Titulo</label>
+                <input class="form-control" @bind="titulo">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Titulo de la variable vertical</label>
+                <input class="form-control" @bind="tituloVertical">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Titulo de la variable horizontal</label>
+                <input class="form-control" @bind="tituloHorizontal">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Datos de la variable horizontal</label>
+                <input class="form-control" @bind="datosHorizontal">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Datos</label>
+                <input class="form-control" @bind="datos">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Nombres de los datos</label>
+                <input class="form-control" @bind="nombresDatos">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">colores de los datos</label>
+                <input class="form-control" @bind="coloresDatos">
+            </div>
+            <button type="submit" class="btn btn-primary" @onclick="CapturarDatos">generar</button>
+        </form>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Titulo de la variable vertical</label>
-        <input class="form-control" @bind="tituloVertical">
+    <div class="col-md-6 bg-secondary">
+        <BarChart @ref="barChart"/>
+        <LineChart @ref="lineChart"/>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Titulo de la variable horizontal</label>
-        <input class="form-control" @bind="tituloHorizontal">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Datos de la variable horizontal</label>
-        <input class="form-control" @bind="datosHorizontal">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Datos</label>
-        <input class="form-control" @bind="datos">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Nombres de los datos</label>
-        <input class="form-control" @bind="nombresDatos">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">colores de los datos</label>
-        <input class="form-control" @bind="coloresDatos">
-    </div>
-    <button type="submit" class="btn btn-primary" @onclick="CapturarDatos">generar</button>
-</form>
-<BarChart @ref="barChart"/>
-<LineChart @ref="lineChart"/>
+</div>
 
 @code {
     private string titulo;
